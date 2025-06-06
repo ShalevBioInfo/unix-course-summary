@@ -308,4 +308,3 @@ clean:
 # The main idea: 'make' checks timestamps.
 # If the target file is missing or outdated (older than its dependencies), the rule is executed.
 # Otherwise, it skips the command and prints: "is up to date".
-בדיקה

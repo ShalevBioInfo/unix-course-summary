@@ -1,0 +1,311 @@
+🗒️ UNIX WORKBENCH – 
+DAY 1 SUMMARY
+
+📂 Navigating Directories:
+- pwd → prints current location
+- cd ~ → go to home directory
+- cd / → go to root directory
+- cd folder_name → enter a subdirectory
+- cd .. → move one directory up
+- cd /path/to/folder → absolute path navigation
+
+📄 Folder Management:
+- mkdir folder_name → create directory
+- ls → list files and folders
+- rm -r folder_name → delete directory (careful—no confirmation)
+
+🧭 Paths:
+- Absolute path: starts with / (e.g., /mnt/c/BioEdit)
+- Relative path: based on current directory (e.g., ../other_folder)
+
+⌨️ Tab Completion:
+- Tab completes folder/file names
+- Double Tab → lists all matching options
+
+🪟 Accessing Windows from Linux:
+- /mnt/c/... → access Windows C drive
+- Example: cd /mnt/c/Users/Shalev/Desktop
+
+📎 Tips:
+- Use pwd to verify location
+- Use ls to see contents before cd
+- Avoid rm -r unless you’re sure
+
+
+🗒️ UNIX WORKBENCH – DAY 2 SUMMARY
+
+UNIX WORKBENCH – DAY 2 SUMMARY
+
+File and Directory Management:
+------------------------------
+mkdir my_folder
+    → Create a new directory named 'my_folder'
+
+touch notes.txt
+    → Create an empty file named 'notes.txt'
+
+cp notes.txt backup.txt
+    → Copy file to a new file named 'backup.txt'
+
+mv backup.txt archive/
+    → Move file to a folder or rename it
+
+rm notes.txt
+rm -r archive/
+    → Delete file or folder (with all contents). Use carefully.
+
+Writing and Appending to Files:
+-------------------------------
+echo "Hello" > file.txt
+    → Write to file (overwrites existing content)
+
+echo "Another line" >> file.txt
+    → Append new content to the end of the file
+
+Viewing File Content:
+---------------------
+cat file.txt
+    → Print the full content of the file
+
+head file.txt
+    → Print the first 10 lines of the file
+
+tail file.txt
+    → Print the last 10 lines of the file
+
+less file.txt
+    → Scroll through file content (use q to quit)
+
+File Statistics:
+----------------
+wc file.txt
+    → Print number of lines, words, and characters
+
+Output Redirection:
+-------------------
+ls ~ > list.txt
+    → Save a list of files in the home directory to list.txt
+
+ls ~ >> list.txt
+    → Append the file list to the same file
+
+Module 2
+
+Help and Manual:
+----------------
+man ls
+    → Show help documentation for a command
+
+apropos calendar
+    → Search for commands related to a keyword
+
+Wildcards:
+----------
+ls *.txt
+    → List all files ending with .txt
+
+rm temp*
+    → Delete all files starting with 'temp'
+
+Trash Recommendation:
+---------------------
+mkdir -p ~/.Trash
+mv file.txt ~/.Trash/
+    → Instead of deleting a file, move it to a custom Trash folder
+
+Tips:
+-----
+- Use pwd to verify current location
+- Use ls to check contents before using cd
+- Avoid rm -r unless you're completely sure
+
+
+REGULAR EXPRESSIONS & TEXT SEARCHING:
+
+🔍 Basic Commands:
+- grep "pattern" filename        → search for lines matching pattern
+- egrep "pattern" filename       → like grep, but supports extended regex
+- find /path -name "filename"    → search for file names in directories
+
+# The -i flag in egrep (or grep) makes the search case-insensitive.
+# This means it ignores the difference between uppercase and lowercase letters.
+
+# The following command finds lowercase or uppercase:
+egrep -i "^[aeiou]" states.txt
+# This is equivalent to writing:
+egrep "^[AEIOUaeiou]" states.txt
+
+🧠 Common Regex Metacharacters:
+.       → Any single character
+\w      → Word character (a-z, A-Z, 0-9, _)
+\W      → Not a word character
+\d      → Digit (0–9)
+\D      → Not a digit
+\s      → Whitespace (space, tab, etc.)
+\S      → Not whitespace
+\n      → Newline
+
+🔣 Sets and Ranges:
+[abc]   → Match 'a' or 'b' or 'c'
+[^abc]  → Match anything except 'a', 'b', or 'c'
+[a-z]   → Range from 'a' to 'z'
+
+📍 Anchors:
+^       → Start of string "^[aeiou]" / "^M"
+$       → End of string "[aeiou]$"
+
+🔢 Quantifiers:
++       → One or more of the previous
+*       → Zero or more of the previous
+?       → Zero or one of the previous
+{n}     → Exactly n occurrences
+{m,n}   → Between m and n occurrences
+{m,}    → m or more occurrences
+
+🔁 Alternation:
+|       → OR between expressions (e.g. food|bar)
+
+🧪 Examples:
+egrep "s+as" states.txt  
+→ Matches lines with 's' repeated 1+ times followed by 'as'  
+  → Matches: Kansas, Arkansas
+
+egrep "\d" small.txt  
+→ Matches lines containing digits
+
+egrep "\W" small.txt  
+→ Matches lines containing symbols or spaces (non-word characters)
+
+egrep "New" states.txt  
+→ Matches: New York, New Mexico, etc.
+
+📌 Tip:
+Use `egrep -v` to invert the match (i.e. return non-matching lines)
+
+
+
+# 📘 Bash History and Aliases Summary
+
+# View command history in the current terminal session
+history
+
+# View full command history saved across sessions
+cat ~/.bash_history
+
+# Create an alias for a frequently used command
+alias ll="ls -lh"
+
+# Make aliases persist across sessions by adding them to this file:
+~/.bash_profile
+
+# Example: Add the following line to ~/.bash_profile
+# alias gs="git status"
+
+# To apply changes without restarting the shell:
+source ~/.bash_profile
+
+# Tip:
+# Use `history | grep keyword` to search past commands
+
+
+# 🔐 Hashing and File Integrity Verification
+
+# shasum – generates a SHA-1 checksum (hash) based on file content.
+# Useful to verify file authenticity and detect corruption.
+
+# Syntax:
+shasum filename
+
+# Example:
+shasum file1.txt
+# Output: a long hexadecimal string + filename
+
+# Comparing two files: save checksums and compare using diff
+
+shasum file1.txt > hash1.txt
+shasum file2.txt > hash2.txt
+diff hash1.txt hash2.txt
+# No output = identical files
+
+# 📝 Notes:
+# - If md5 is unavailable, use shasum (default on Ubuntu).
+# - Useful for checking downloads or ensuring no unintended changes.
+
+
+# PIPES (|) – CONNECTING COMMANDS IN THE SHELL
+
+# Pipes allow chaining commands: output of one becomes input of the next.
+# Symbol: |  (Usually Shift + \)
+
+# 📌 Basic usage:
+# The output of the left-hand command becomes the input for the right-hand one.
+
+# Example 1 – Count how many US states end in a vowel:
+grep "[aeiou]$" states.txt | wc -l
+# → 32
+
+# Explanation:
+# - grep "[aeiou]$" finds all lines ending in a vowel
+# - wc -l counts the number of matching lines
+
+# Example 2 – Combine 3 commands:
+ls -l | grep "Feb" | less
+# → List all files modified in February and view them scrollably with less
+
+# Notes:
+# - You can chain multiple pipes
+# - Pipes make command-line workflows much more powerful and readable
+
+# 🧠 Count Unique Commands from History
+
+# This command counts how many unique commands you've ever used:
+cat ~/.bash_history | sort | uniq | wc -l
+
+# Explanation:
+# - 'cat ~/.bash_history' prints your command history.
+# - 'sort' arranges the lines alphabetically.
+# - 'uniq' removes repeated adjacent commands.
+# - 'wc -l' counts the number of unique lines (i.e., commands).
+
+# Optional: To count only unique command names (ignoring arguments):
+cut -d' ' -f1 ~/.bash_history | sort | uniq | wc -l
+
+
+
+
+# === Summary: Make and Makefiles ===
+# The 'make' command automates tasks like building files or running scripts by checking file dependencies.
+
+# A makefile is a plain text file that defines "rules" in the following format:
+# target: dependencies
+#     commands (must be TAB-indented)
+
+# Example 1: Create a file if it doesn't exist
+draft_journal_entry.txt:
+	touch draft_journal_entry.txt
+
+# Example 2: Build a file based on another (dependency)
+readme.txt: toc.txt
+	echo "This journal contains the following number of entries:" > readme.txt
+	wc -l toc.txt | egrep -o "[0-9]+" >> readme.txt
+
+# If 'toc.txt' is modified, and we run `make readme.txt`,
+# then 'readme.txt' will be rebuilt with the updated line count.
+
+# Example 3: Use the 'all' rule to group multiple targets:
+all: draft_journal_entry.txt readme.txt
+
+# Now, running just `make` will trigger both targets.
+
+# Example 4: Add a 'clean' rule to delete generated files:
+clean:
+	rm draft_journal_entry.txt
+	rm readme.txt
+
+# This lets you reset your directory using:
+#   make clean
+
+# The main idea: 'make' checks timestamps.
+# If the target file is missing or outdated (older than its dependencies), the rule is executed.
+# Otherwise, it skips the command and prints: "is up to date".
+בדיקה

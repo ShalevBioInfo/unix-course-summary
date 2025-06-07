@@ -271,8 +271,7 @@ cat ~/.bash_history | sort | uniq | wc -l
 cut -d' ' -f1 ~/.bash_history | sort | uniq | wc -l
 
 
-
-
+# --------------------------------
 # === Summary: Make and Makefiles ===
 # The 'make' command automates tasks like building files or running scripts by checking file dependencies.
 
@@ -308,3 +307,286 @@ clean:
 # The main idea: 'make' checks timestamps.
 # If the target file is missing or outdated (older than its dependencies), the rule is executed.
 # Otherwise, it skips the command and prints: "is up to date".
+
+# Math:
+#!/usr/bin/env bash
+# The line '#!/usr/bin/env bash' tells the system to run the script using Bash,
+# locating it via the environment for better portability across systems.
+
+# --------------------------------
+# Summary: Arithmetic in Bash
+
+# Bash scripts run line by line, from top to bottom.
+# Anything after a '#' is a comment and not executed.
+
+# The 'expr' command lets you perform simple integer arithmetic:
+expr 5 + 2     # 7
+expr 5 - 2     # 3
+expr 5 \* 2    # 10 (note: the '*' must be escaped with a backslash)
+expr 5 / 2     # 2 (Bash does integer division only)
+
+# Integer division always rounds down:
+expr 1 / 3     # 0
+expr 10 / 3    # 3
+
+# Use '%' for modulus (remainder) operations:
+expr 10 % 3    # 1
+expr 40 % 21   # 19
+
+# For floating-point arithmetic, use 'bc' with the -l (math library) flag:
+echo "22 / 7" | bc -l           # 3.142857...
+echo "4.2 * 9.15" | bc -l       # 38.4300
+echo "(6.5 / 0.5) + (6 * 2.2)" | bc -l  # 21.4
+
+# 'bc' allows you to calculate with decimals by piping math expressions into it.
+
+# You can use 'bc -l' in two main ways:
+
+# 1. Interactive mode:
+# Type 'bc -l' in the terminal and enter math expressions manually.
+# Example:
+# bc -l
+# 22 / 7
+# sqrt(2)
+# quit
+
+# 2. Piping expressions from a file:
+# Write expressions in a plain text file (e.g., bigmath.sh), one per line:
+# 22 / 7
+# sqrt(2)
+# 10^2
+# Then run:
+cat bigmath.sh | bc -l
+# 'cat' reads the file, '|' sends it to 'bc -l' for decimal calculations.
+
+# --------------------------------
+# Summary: Variables in Bash
+
+# Variables are assigned using '=' with no spaces:
+chapter_number=5      # valid
+# chapter_number = 5  → invalid (will cause an error)
+
+# Access variable values using the $ prefix:
+echo $chapter_number  # 5
+
+# Modify numeric variables using 'let':
+let chapter_number=$chapter_number+1
+echo $chapter_number  # 6
+
+# Store strings in variables:
+the_empire_state="New York"
+echo $the_empire_state  # New York
+
+# Insert variable into a sentence:
+echo "I went to school in $the_empire_state."
+# Output: I went to school in New York.
+
+# Command substitution: run a command and store its output in a variable
+math_lines=$(cat math.sh | wc -l)
+echo $math_lines       # Number of lines in math.sh
+
+# Bash scripts can receive command line arguments:
+
+# --------------------------------
+# Example script (vars.sh):
+
+# #!/usr/bin/env bash
+# echo "Script arguments: $@"
+# echo "First arg: $1. Second arg: $2."
+# echo "Number of arguments: $#"
+
+# Example runs:
+# bash vars.sh red blue
+# Output:
+# Script arguments: red blue
+# First arg: red. Second arg: blue.
+# Number of arguments: 2
+
+# $1 is the first argument, $2 the second, $@ is all args, $# is the count
+
+# --------------------------------
+# Example - Assigning and printing variables in Bash
+#!/usr/bin/env bash
+
+# Numbers can be stored using command substitution:
+a=$(expr 2 + 2)
+b=$(expr 1 + 2)
+
+# Or with 'let':
+let a=2+2
+let b=1+2
+
+# Or with arithmetic expansion:
+a=$((2 + 2))
+b=$((1 + 2))
+
+echo "$a $b"     # Print both numbers on the same line
+echo "$a"        # Print each number separately
+echo "$b"
+
+# Strings can be assigned directly:
+first_name="Shalev"
+last_name="Yaacov"
+
+# Print both strings on the same line:
+echo "$first_name $last_name"
+# --------------------------------
+
+# Task Example: Write a Bash program that multiplies the number of arguments ($#) by the first argument ($1), and prints the result.
+# Important: Bash doesn't evaluate expressions like "echo "$# * $1"" as math.
+# Without 'let' or $((...)), Bash treats it as plain text (a string), not a calculation.
+
+let noa=$#        # number of arguments
+let fa=$1         # first argument
+let final_1=$noa\*$fa
+echo "$final_1"   # prints the result of $# * $1
+let
+
+# You can also do it in one line:
+let final_2=$#\*$1
+echo "$final_2"
+
+# Example:
+# bash script.sh 3 5
+# → Number of arguments: 2
+# → First arg: 3
+# → 6 (because 2 * 3 = 6)
+
+# --------------------------------
+
+# Summary: User input with 'read'
+
+# The 'read' command pauses the script and waits for user input.
+# The input is stored in a variable of your choice.
+
+# Example:
+echo "Type in a string and then press Enter:"
+read response
+echo "You entered: $response"
+
+# When run, the script waits for user input.
+# After typing (e.g., Hello!) and pressing Enter, it outputs:
+# You entered: Hello!
+
+# This is useful for interactive Bash scripts that ask users for input at runtime.
+# --------------------------------
+
+# Example: Using 'read' to collect words and build a sentence
+
+# This script asks the user for an adjective, a noun, and a verb,
+# then combines them into a sentence (like a simple Mad Libs game).
+
+echo "Enter an adjective:"
+read adj
+
+echo "Enter a noun:"
+read noun
+
+echo "Enter a verb:"
+read verb
+
+echo "The $adj $noun likes to $verb every morning."
+# --------------------------------
+
+
+# Summary: Conditionals and comparisons in Bash
+
+# Every Bash command returns an exit status:
+# 0 = success (true), non-zero = failure (false)
+true     # returns 0
+false    # returns 1
+
+# Conditional execution:
+# cmd1 && cmd2 → run cmd2 only if cmd1 succeeds
+# cmd1 || cmd2 → run cmd2 only if cmd1 fails
+
+# Conditional expressions are written in [[ ... ]].
+# They return 0 (true) if the condition is met, 1 (false) otherwise.
+
+# Example:
+x=5
+if [[ $x -gt 3 ]]; then
+  echo "x is greater than 3"
+fi
+
+# Comparison flags:
+# -gt : greater than         [[ $a -gt 3 ]]
+# -ge : greater or equal     [[ $a -ge 3 ]]
+# -lt : less than            [[ $a -lt 3 ]]
+# -le : less or equal        [[ $a -le 3 ]]
+# -eq : equal                [[ $a -eq 3 ]]
+# -ne : not equal            [[ $a -ne 3 ]]
+
+# File/string tests:
+# -e  : file exists          [[ -e file.txt ]]
+# -d  : directory exists     [[ -d folder ]]
+# -z  : string is empty      [[ -z $str ]]
+# -n  : string is not empty  [[ -n $str ]]
+
+# String and regex comparisons:
+# =    : equal               [[ $name = "Bob" ]]
+# !=   : not equal           [[ $name != "Alice" ]]
+# =~   : regex match         [[ $input =~ ^[0-9]+$ ]]
+# !    : not                 [[ ! -e file.txt ]]
+
+# Control flow:
+if [[ condition ]]; then
+  # code if condition is true
+elif [[ other_condition ]]; then
+  # alternative
+else
+  # fallback
+fi
+
+# --------------------------------
+# Summary: Logic and If/Else Exercises in Bash
+#!/usr/bin/env bash
+
+# 1. Check if a string starts with a capital letter
+# This uses regex and [[ ... ]] to test if the first character is uppercase.
+
+input=$1
+if [[ $input =~ ^[A-Z] ]]; then
+  echo "how proper"
+fi
+# 🔹 Note: ^[A-Z] matches strings starting with a capital letter.
+# ------------------------------
+
+# 2. Print "even" or "odd" based on input number
+# Use modulus (%) to check parity.
+
+num=$1
+let remainder=$num%2
+if [[ $remainder -eq 0 ]]; then
+  echo "even"
+else
+  echo "odd"
+fi
+# 🔹 Tip: Arithmetic must be done using 'let' or $((...)). Don't expect "$a * $b" to calculate.
+# ------------------------------
+
+# 3. If both arguments are numbers, print their sum. Otherwise, print both arguments.
+
+x=$1
+y=$2
+if [[ $x =~ ^[0-9]+$ && $y =~ ^[0-9]+$ ]]; then
+  let sum=$x+$y
+  echo "$sum"
+else
+  echo "$x"
+  echo "$y"
+fi
+# 🔹 Note:
+# - The regex ^[0-9]+$ ensures the entire string is numeric.
+# - [[ ... && ... ]] allows combining multiple conditions.
+# ------------------------------
+
+# 4. Print a message only if today is Friday
+
+day=$(date +%a)
+if [[ $day == "Fri" ]]; then
+  echo "Thank Moses it's Friday"
+fi
+# 🔹 Use 'date +%a' to extract the day abbreviation (e.g., Mon, Tue, Fri)
+# ------------------------------
+
